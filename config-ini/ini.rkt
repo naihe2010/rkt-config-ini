@@ -1,11 +1,16 @@
 #lang racket
 
 (require racket/file)
-(require racket/help)
 
 (provide ini-new)
 (provide ini-read)
 (provide ini-write)
+(provide ini-sections)
+(provide ini-has-key?)
+(provide ini-get-key-string)
+(provide ini-get-key-boolean)
+(provide ini-get-key-number)
+(provide ini-set-key)
 
 (define (ini? a)
   (hash? a))
@@ -19,10 +24,10 @@
   (make-hash))
 
 (define (append-ini ini entry x)
-  (let ([matchs (regexp-match #px"^\\s*(.+)\\s*=\\s*(.+)\\s*$" x)])
-    (if (= (length matchs) 3)
-        (let ([token (string-append entry ":" (list-ref matchs 1))]
-              [value (list-ref matchs 2)])
+  (let ([matchs (string-split x "=" #:repeat? #t)])
+    (if (= (length matchs) 2)
+        (let ([token (string-append entry ":" (string-trim (list-ref matchs 0)))]
+              [value (string-trim (list-ref matchs 1))])
           (hash-set! ini token value))
         (error (string-append "line error:" x)))))
 
@@ -32,7 +37,7 @@
       (if (or (regexp-match #px"^\\s#" line)
               (regexp-match #px"^\\s*$" line))
           (ini-read-line input)
-          (string-copy line)))))
+          (string-trim line)))))
 
 (define (input-ini input ini entry)
   (define x (ini-read-line input))
@@ -46,7 +51,7 @@
 (define (output-ini output ini)
   (letrec ([entry ""])
     (for ([i (sort (hash-keys ini) string<?)])
-      (let* ([nlist (regexp-split  #rx":" i)]
+      (let* ([nlist (string-split i ":")]
              [tentry (list-ref nlist 0)]
              [ttoken (list-ref nlist 1)]
              [value (hash-ref ini i)])
@@ -67,3 +72,34 @@
     (lambda (output) (output-ini output ini))
     #:mode 'text
     #:exists 'truncate))
+
+(define (ini-sections ini)
+  (let ([tokens (make-hash)])
+    (hash-for-each ini
+                   (lambda (k v)
+                     (hash-set! tokens
+                                (list-ref (string-split k ":") 0)
+                                1)))
+    (hash-keys tokens)))
+
+(define (ini-has-key? ini entry key)
+  (hash-has-key? ini (string-append entry ":" key)))
+
+(define (ini-get-key-string ini entry key)
+  (hash-ref ini(string-append entry ":" key)))
+
+(define (ini-get-key-boolean ini entry key)
+  (let* ([str (ini-get-key-string ini entry key)]
+         [fch (substring str 0 1)])
+    (if (or (string=? fch "y")
+            (string=? fch "Y")
+            (string=? fch "t")
+            (string=? fch "T")
+            (string=? fch "1")) #t #f)))
+
+(define (ini-get-key-number ini entry key)
+  (let* ([str (ini-get-key-string ini entry key)])
+    (string->number str)))
+
+(define (ini-set-key ini entry key value)
+  (hash-set! ini (string-append entry ":" key) value))
