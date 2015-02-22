@@ -24,7 +24,7 @@
   (make-hash))
 
 (define (append-ini ini entry x)
-  (let ([matchs (string-split x "=" #:repeat? #t)])
+  (let ([matchs (string-split x "=" #:trim? #f)])
     (if (= (length matchs) 2)
         (let ([token (string-append entry ":" (string-trim (list-ref matchs 0)))]
               [value (string-trim (list-ref matchs 1))])
