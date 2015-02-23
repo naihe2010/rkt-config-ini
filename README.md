@@ -22,6 +22,9 @@ is a mutable hash table.*
 ## test if token is in ini
 > (ini-has-key? my-ini "global" "ip")
 
+## test if entry is in ini
+> (ini-has-section? my-ini "global")
+
 ## get string value from ini
 > (ini-get-key-string my-ini "global" "ip")
 

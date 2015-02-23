@@ -7,6 +7,7 @@
 (provide ini-write)
 (provide ini-sections)
 (provide ini-has-key?)
+(provide ini-has-section?)
 (provide ini-get-key-string)
 (provide ini-get-key-boolean)
 (provide ini-get-key-number)
@@ -84,6 +85,11 @@
 
 (define (ini-has-key? ini entry key)
   (hash-has-key? ini (string-append entry ":" key)))
+
+(define (ini-has-section? ini entry)
+  (if
+   (findf (lambda (e) (string=? e entry)) (ini-sections ini))
+   #t #f))
 
 (define (ini-get-key-string ini entry key)
   (hash-ref ini(string-append entry ":" key)))
