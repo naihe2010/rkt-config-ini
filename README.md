@@ -32,7 +32,7 @@ is a mutable hash table.*
 > (ini-get-key-number my-ini "global" "port")
 
 ## get boolean value from ini
-> (ini-get-key-number my ini "global" "reuse")
+> (ini-get-key-boolean my ini "global" "reuse")
 
 ## set value to ini
 *value must be string*
@@ -41,3 +41,9 @@ is a mutable hash table.*
 > (ini-set-key my-ini "global" "port" (number->string 8080))
 
 > (ini-set-key my-ini "global" "reuse" "yes")
+
+## remove key from ini
+> (ini-remove-key my-ini "global" "ip")
+
+## remove section from ini
+> (ini-remove-section my-ini "global")

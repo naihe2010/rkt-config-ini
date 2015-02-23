@@ -12,6 +12,8 @@
 (provide ini-get-key-boolean)
 (provide ini-get-key-number)
 (provide ini-set-key)
+(provide ini-remove-key)
+(provide ini-remove-section)
 
 (define (ini? a)
   (hash? a))
@@ -109,3 +111,13 @@
 
 (define (ini-set-key ini entry key value)
   (hash-set! ini (string-append entry ":" key) value))
+
+(define (ini-remove-key ini entry key)
+  (hash-remove! ini (string-append entry ":" key)))
+
+(define (ini-remove-section ini entry)
+  (hash-for-each ini
+                 (lambda (k v)
+                   (let* ([matchs (string-split k ":")])
+                     (when (string=? (list-ref matchs 0) entry)
+                       (hash-remove! ini k))))))
