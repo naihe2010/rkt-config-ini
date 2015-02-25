@@ -2,27 +2,6 @@
 
 (require racket/file)
 
-(provide ini-new)
-(provide ini-read)
-(provide ini-write)
-(provide ini-sections)
-(provide ini-has-key?)
-(provide ini-has-section?)
-(provide ini-get-key-string)
-(provide ini-get-key-boolean)
-(provide ini-get-key-number)
-(provide ini-set-key)
-(provide ini-remove-key)
-(provide ini-remove-section)
-
-(define (ini? a)
-  (hash? a))
-
-;;(provide (contract-out
-;;        [ini-new (-> void ini?)]
-;;      [ini-read (-> (-> ini? string?) boolean?)]
-;;    [ini-write (-> (-> ini? string?) boolean?)]))
-
 (define (ini-new)
   (make-hash))
 
@@ -99,11 +78,7 @@
 (define (ini-get-key-boolean ini entry key)
   (let* ([str (ini-get-key-string ini entry key)]
          [fch (substring str 0 1)])
-    (if (or (string=? fch "y")
-            (string=? fch "Y")
-            (string=? fch "t")
-            (string=? fch "T")
-            (string=? fch "1")) #t #f)))
+    (for/or ([ch (list "y" "Y" "t" "T" "1")]) (string=? ch fch))))
 
 (define (ini-get-key-number ini entry key)
   (let* ([str (ini-get-key-string ini entry key)])
@@ -121,3 +96,18 @@
                    (let* ([matchs (string-split k ":")])
                      (when (string=? (list-ref matchs 0) entry)
                        (hash-remove! ini k))))))
+
+;; Provides
+(provide
+ ini-new
+ ini-read
+ ini-write
+ ini-sections
+ ini-has-key?
+ ini-has-section?
+ ini-get-key-string
+ ini-get-key-boolean
+ ini-get-key-number
+ ini-set-key
+ ini-remove-key
+ ini-remove-section)
