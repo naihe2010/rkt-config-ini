@@ -76,15 +76,18 @@
     (string->number str)))
 
 (define (ini-set-key ini entry key value)
-  (cond
-    [(string? value)
-     (hash-set! (hash-ref ini entry) key value)]
-    [(number? value)
-     (hash-set! (hash-ref ini entry) key (number->string value))]
-    [(boolean? value)
-     (hash-set! (hash-ref ini entry) key (if value "1" "0"))]
-    [else
-     (error (string-append "Not supported data type of:" value))]))
+  (unless (hash-has-key? ini entry)
+    (hash-set! ini entry (make-hash)))
+  (let ([inientry (hash-ref ini entry)])
+    (cond
+      [(string? value)
+       (hash-set! inientry key value)]
+      [(number? value)
+       (hash-set! inientry key (number->string value))]
+      [(boolean? value)
+       (hash-set! inientry key (if value "1" "0"))]
+      [else
+       (error (string-append "Not supported data type of:" value))])))
 
 (define (ini-remove-key ini entry key)
   (hash-remove! (hash-ref ini entry) key))
