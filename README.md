@@ -17,7 +17,7 @@ is a mutable hash table.*
 > (ini-write my-ini "/tmp/test2.ini")
 
 ## get section list
-> (ini-get-sections my-ini)
+> (ini-sections my-ini)
 
 ## test if token is in ini
 > (ini-has-key? my-ini "global" "ip")
